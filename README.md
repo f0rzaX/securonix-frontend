@@ -39,7 +39,7 @@ cd securonix-frontend
 
 #### 3. Install dependencies:
 ```bash
-npm install
+npm install --force
 ```
 
 #### 4. Start the Development Server
