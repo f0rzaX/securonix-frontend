@@ -11,7 +11,16 @@ const UploadPage = () => {
     const dispatch = useDispatch();
 
     const handleFileChange = (event) => {
-        setFile(event.target.files[0]);
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+            const fileType = selectedFile.name.split('.').pop().toLowerCase();
+            if (['xls', 'xlsm', 'csv'].includes(fileType)) {
+                setFile(selectedFile);
+            } else {
+                alert('Please upload only XLS, XLSM, or CSV files.');
+                event.target.value = null;
+            }
+        }
     };
 
     const handleUpload = async () => {
