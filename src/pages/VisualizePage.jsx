@@ -16,11 +16,12 @@ const VisualizePage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterValues, setFilterValues] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
-    const fetchData = async ({ page = 1, query = '', filters = {} }) => {
+    const fetchData = async ({ page = 1, query = '', filters = {}, sortKey = null, sortDirection = 'ascending' }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post(import.meta.env.VITE_BACKEND_URL + "/" + import.meta.env.VITE_BACKEND_DATA_ROUTE, { page, query, filters }, {
+            const response = await axios.post(import.meta.env.VITE_BACKEND_URL + "/" + import.meta.env.VITE_BACKEND_DATA_ROUTE, { page, query, filters, sortKey, sortDirection }, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }
@@ -48,9 +49,10 @@ const VisualizePage = () => {
         }
     };
 
+
     useEffect(() => {
-        fetchData({ page: currentPage, query: searchQuery, filters: filterValues });
-    }, [currentPage, searchQuery, filterValues]);
+        fetchData({ page: currentPage, query: searchQuery, filters: filterValues, sortKey: sortConfig.key, sortDirection: sortConfig.direction });
+    }, [currentPage, searchQuery, filterValues, sortConfig]);
 
 
     const handlePageChange = (page) => {
@@ -82,7 +84,9 @@ const VisualizePage = () => {
 
     const handleClear = () => {
         setSearchQuery('');
-        fetchData({ page: 1, query: '', filters: {} });
+        setFilterValues({});
+        setCurrentPage(1);
+        setSortConfig({ key: null, direction: 'ascending' });
     };
 
     if (errorMessage) {
@@ -97,6 +101,10 @@ const VisualizePage = () => {
                 </div></>
         )
     }
+
+    const handleSort = (columnName, direction) => {
+        setSortConfig({ key: columnName, direction });
+    };
 
 
     return (
@@ -144,6 +152,7 @@ const VisualizePage = () => {
                         <DataTable
                             columns={columns}
                             data={data}
+                            onSort={handleSort}
                         />
 
                         <nav aria-label="Table navigation" className="overflow-x-auto">
